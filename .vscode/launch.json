@@ -1,0 +1,33 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Twitter.Analytics.Api",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "Build",
+      "program": "${workspaceFolder}/src/Twitter.Analytics.Api/bin/Debug/net6.0/Twitter.Analytics.Api.dll",
+      "args": [
+        "--urls",
+        "http://localhost:5005"
+
+      ],
+      "cwd": "${workspaceFolder}/src/Twitter.Analytics.Api",
+      "stopAtEntry": false,
+      "serverReadyAction": {
+        "action": "openExternally",
+        "pattern": "\\bNow listening on:\\s+(https?://\\S+)",
+        "uriFormat": "%s/swagger/index.html"
+      },
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNETCORE_JWT__Secret": "87c10446-aa6a-4df3-8615-d4302cd205fb",
+        "ASPNETCORE_BUCKETS3": "https://improve-cursos.s3.amazonaws.com/files-uploaded/",
+        "ASPNETCORE_QUEUES__QueueUrl": "https://sqs.us-east-1.amazonaws.com/520197456211/"
+      },
+      "sourceFileMap": {
+        "/Views": "${workspaceFolder}/Views"
+      }
+    }
+  ]
+}

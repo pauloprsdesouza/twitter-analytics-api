@@ -1,0 +1,37 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build:Twitter.Analytics.Api",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "build",
+        "${workspaceFolder}/src/Twitter.Analytics.Api/Twitter.Analytics.Api.csproj",
+        "/property:GenerateFullPaths=true",
+        "/consoleloggerparameters:NoSummary"
+      ],
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "build:Improve.Admin.Tests",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "test",
+        "${workspaceFolder}/src/Improve.Admin.Tests/Improve.Admin.Tests.csproj",
+        "/p:CollectCoverage=true",
+        "/p:CoverletOutputFormat=lcov",
+        "/p:CoverletOutput=${workspaceFolder}/src/Improve.Admin.Tests/coverage/lcov.info"
+      ],
+    },
+    {
+      "label": "Build",
+      "dependsOrder": "sequence",
+      "dependsOn": [
+        //"build:Improve.Admin.Tests",
+        "build:Twitter.Analytics.Api"
+      ]
+    }
+  ]
+}

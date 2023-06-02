@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+   <TargetFramework>net6.0</TargetFramework>
+    <AWSProjectType>Lambda</AWSProjectType>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);1591</NoWarn>
+    <ImplicitUsings>disable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.13" />
+    <PackageReference Include="Microsoft.NETCore.Platforms" Version="6.0.7" />
+    <PackageReference Include="NUlid" Version="1.7.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore.ReDoc" Version="6.5.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Twitter.Analytics.Domain\Twitter.Analytics.Domain.csproj" />
+    <ProjectReference Include="..\Twitter.Analytics.Contracts\Twitter.Analytics.Contracts.csproj" />
+    <ProjectReference
+      Include="..\Twitter.Analytics.Application\Twitter.Analytics.Application.csproj" />
+    <ProjectReference
+      Include="..\Twitter.Analytics.Infrastructure\Twitter.Analytics.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>
