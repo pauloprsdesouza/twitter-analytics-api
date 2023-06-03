@@ -7,6 +7,7 @@ namespace Twitter.Analytics.Domain.Accounts
     public interface IAccountService
     {
         Task<Account> FindById(string accountId);
+        Task<List<Account>> FindAll();
         Task<Account> Create(Account account);
         Task<List<Account>> CreateFromList(List<Account> accounts);
     }

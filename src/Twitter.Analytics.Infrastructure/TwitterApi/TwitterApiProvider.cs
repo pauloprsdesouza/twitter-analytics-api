@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
@@ -39,7 +37,6 @@ namespace Twitter.Analytics.Infrastructure.TwitterApi
                 response.EnsureSuccessStatusCode();
 
                 return await response.ReadAsJsonAsync<TweetResponseModel>();
-
             }
             catch (System.Exception ex)
             {
@@ -48,24 +45,72 @@ namespace Twitter.Analytics.Infrastructure.TwitterApi
             }
         }
 
-        public Task GetPublishedTweetsFromAccount()
+        public async Task<TweetResponseModel> GetPublishedTweetsFromAccount(string accountId)
         {
-            throw new NotImplementedException();
+            var param = new QueryBuilder();
+            param.Add("tweet.fields", "attachments,author_id,context_annotations,created_at,entities,geo,in_reply_to_user_id,lang,public_metrics,reply_settings,source");
+            param.Add("user.fields", "created_at,entities,id,location,name,pinned_tweet_id,profile_image_url,protected,public_metrics,url,username,verified");
+            param.Add("expansions", "attachments.media_keys,referenced_tweets.id,author_id");
+            param.Add("max_results", "100");
+
+            try
+            {
+                var response = await _client.GetAsync($"users/{accountId}/tweets{param}");
+                response.EnsureSuccessStatusCode();
+
+                return await response.ReadAsJsonAsync<TweetResponseModel>();
+            }
+            catch (System.Exception ex)
+            {
+                _logger.LogError(ex, "UNABLE_TO_GET_TWEETS");
+                return null;
+            }
         }
 
-        public Task GetRepliesFromAccount()
+        public async Task<TweetResponseModel> GetMentionsFromAccount(string username)
         {
-            throw new NotImplementedException();
+            var param = new QueryBuilder();
+            param.Add("query", $"@{username}");
+            param.Add("tweet.fields", "attachments,author_id,context_annotations,created_at,entities,geo,in_reply_to_user_id,lang,public_metrics,reply_settings,source");
+            param.Add("user.fields", "created_at,entities,id,location,name,pinned_tweet_id,profile_image_url,protected,public_metrics,url,username,verified");
+            param.Add("expansions", "attachments.media_keys,referenced_tweets.id,author_id");
+            param.Add("max_results", "100");
+
+            try
+            {
+                var response = await _client.GetAsync($"search{param}");
+                response.EnsureSuccessStatusCode();
+
+                return await response.ReadAsJsonAsync<TweetResponseModel>();
+            }
+            catch (System.Exception ex)
+            {
+                _logger.LogError(ex, "UNABLE_TO_GET_TWEETS");
+                return null;
+            }
         }
 
-        public Task GetTweetsFromAccount()
+        public async Task<TweetResponseModel> GetRepliesFromAccount(string username)
         {
-            throw new NotImplementedException();
-        }
+            var param = new QueryBuilder();
+            param.Add("query", $"to:{username}");
+            param.Add("tweet.fields", "attachments,author_id,context_annotations,created_at,entities,geo,in_reply_to_user_id,lang,public_metrics,reply_settings,source");
+            param.Add("user.fields", "created_at,entities,id,location,name,pinned_tweet_id,profile_image_url,protected,public_metrics,url,username,verified");
+            param.Add("expansions", "attachments.media_keys,referenced_tweets.id,author_id");
+            param.Add("max_results", "100");
 
-        public Task GetUsersFromIds()
-        {
-            throw new NotImplementedException();
+            try
+            {
+                var response = await _client.GetAsync($"search{param}");
+                response.EnsureSuccessStatusCode();
+
+                return await response.ReadAsJsonAsync<TweetResponseModel>();
+            }
+            catch (System.Exception ex)
+            {
+                _logger.LogError(ex, "UNABLE_TO_GET_TWEETS");
+                return null;
+            }
         }
     }
 }

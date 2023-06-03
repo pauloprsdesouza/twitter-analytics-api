@@ -1,4 +1,5 @@
 using Amazon.DynamoDBv2.DataModel;
+using Twitter.Analytics.Infrastructure.Database.Converters;
 using Twitter.Analytics.Infrastructure.Database.DataModel.BaseModels;
 
 namespace Twitter.Analytics.Infrastructure.Database.DataModel.Users
@@ -35,5 +36,8 @@ namespace Twitter.Analytics.Infrastructure.Database.DataModel.Users
 
         [DynamoDBProperty]
         public double InfluenceScore { get; set; }
+
+        [DynamoDBProperty(typeof(BoolConverter))]
+        public bool IsProcessed { get; set; }
     }
 }

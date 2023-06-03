@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Amazon.DynamoDBv2.DataModel;
+using Amazon.DynamoDBv2.DocumentModel;
 using AutoMapper;
 using Twitter.Analytics.Domain.Accounts;
 using Twitter.Analytics.Domain.Accounts.Entities;
@@ -46,6 +47,17 @@ namespace Twitter.Analytics.Infrastructure.Database.DataModel.Users
             await batch.ExecuteAsync();
 
             return accounts;
+        }
+
+        public async Task<List<Account>> FindAllUnprocessed(int total)
+        {
+            var primaryKey = new AccountKey();
+            var accountsModel = await new DynamoDbQueryBuilder<AccountModel>(primaryKey, _dbContext)
+                                                .Build(5);
+
+            var accounts = _mapper.Map<List<Account>>(accountsModel);
+
+            return accounts.Take(5).ToList();
         }
 
         public async Task<Account> FindById(string accountId)

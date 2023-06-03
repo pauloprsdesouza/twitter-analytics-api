@@ -1,9 +1,12 @@
+using System.Xml.Linq;
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Twitter.Analytics.Domain.Accounts;
 using Twitter.Analytics.Domain.Tweets;
 
 namespace Twitter.Analytics.Infrastructure.Jobs
@@ -27,6 +30,15 @@ namespace Twitter.Analytics.Infrastructure.Jobs
             {
                 var scope = _provider.CreateScope();
                 var tweetService = scope.ServiceProvider.GetService<ITweetService>();
+                var accountRepository = scope.ServiceProvider.GetService<IAccountRepository>();
+
+                var accounts = await accountRepository.FindAllUnprocessed(5);
+
+                var requests = accounts.Select(x => tweetService.GetPublishedTweetsFromAccount(x.Id));
+                var responses = await Task.WhenAll(requests);
+
+                var tweets = responses.SelectMany(x => x.ToList()).ToList();
+                await tweetService.CreateFromList(tweets);
 
                 await Task.Delay(TimeSpan.FromSeconds(30), stoppingToken);
             }

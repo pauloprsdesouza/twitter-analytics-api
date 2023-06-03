@@ -14,6 +14,11 @@ namespace Twitter.Analytics.Application.Accounts
             _accountRepository = accountRepository;
         }
 
+         public async Task<List<Account>> FindAll()
+        {
+            return await _accountRepository.FindAllUnprocessed(10);
+        }
+
         public async Task<Account> Create(Account account)
         {
             return await _accountRepository.Create(account);

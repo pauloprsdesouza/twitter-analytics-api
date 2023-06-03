@@ -12,6 +12,8 @@ using Microsoft.AspNetCore.Mvc;
 using Twitter.Analytics.Domain.Accounts.Entities;
 using Twitter.Analytics.Domain.Accounts.Models;
 using Twitter.Analytics.Domain.Tweets;
+using Twitter.Analytics.Domain.Tweets.Entities;
+using Twitter.Analytics.Domain.Tweets.Models;
 
 namespace Twitter.Analytics.Api.Controllers
 {
@@ -25,14 +27,34 @@ namespace Twitter.Analytics.Api.Controllers
             _tweetService = tweetService;
         }
 
-
-        [HttpGet]
+        [HttpPost]
         [Produces(MediaTypeNames.Application.Json)]
-        public async Task<IActionResult> Find([FromQuery] List<long> ids)
+        public async Task<IActionResult> SaveTweetsFromCsv(IFormFile csvFile)
         {
-            var response = await _tweetService.GetTweetsFromIds(ids);
+            try
+            {
+                if (csvFile == null || csvFile.Length == 0)
+                {
+                    return BadRequest("No file uploaded.");
+                }
 
-            return Ok(response);
+                var config = new CsvConfiguration(CultureInfo.InvariantCulture);
+
+                using (var reader = new StreamReader(csvFile.OpenReadStream()))
+                using (var csv = new CsvReader(reader, config))
+                {
+                    csv.Context.RegisterClassMap<TweetMap>();
+                    var tweets = csv.GetRecords<Tweet>().ToList();
+
+                    await _tweetService.CreateFromList(tweets);
+
+                    return Ok(tweets);
+                }
+            }
+            catch (System.Exception ex)
+            {
+                return NoContent();
+            }
         }
     }
 }

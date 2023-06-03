@@ -1,4 +1,6 @@
 using Amazon.DynamoDBv2.DataModel;
+using Twitter.Analytics.Domain.Tweets.Entities;
+using Twitter.Analytics.Infrastructure.Database.Converters;
 using Twitter.Analytics.Infrastructure.Database.DataModel.BaseModels;
 
 namespace Twitter.Analytics.Infrastructure.Database.DataModel.Tweets
@@ -29,5 +31,8 @@ namespace Twitter.Analytics.Infrastructure.Database.DataModel.Tweets
 
         [DynamoDBProperty]
         public int EngagementScore { get; set; }
+
+        [DynamoDBProperty(typeof(EnumConverter<TweetType>))]
+        public TweetType Type { get; set; }
     }
 }

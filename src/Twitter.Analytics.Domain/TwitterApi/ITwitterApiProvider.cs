@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Twitter.Analytics.Domain.TwitterApi.Models;
 
@@ -8,10 +6,9 @@ namespace Twitter.Analytics.Domain.TwitterApi
 {
     public interface ITwitterApiProvider
     {
-        Task GetTweetsFromAccount();
-        Task GetUsersFromIds();
-        Task GetRepliesFromAccount();
+        Task<TweetResponseModel> GetMentionsFromAccount(string username);
+        Task<TweetResponseModel> GetRepliesFromAccount(string username);
         Task<TweetResponseModel> GetTweetsFromIds(List<long> ids);
-        Task GetPublishedTweetsFromAccount();
+        Task<TweetResponseModel> GetPublishedTweetsFromAccount(string accountId);
     }
 }

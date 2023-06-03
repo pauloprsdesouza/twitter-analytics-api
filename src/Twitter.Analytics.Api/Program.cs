@@ -1,15 +1,14 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-
 using Twitter.Analytics.Api.Configuration;
 using Twitter.Analytics.Api.DependencyInjection;
 using Twitter.Analytics.Api.Filters;
+using Twitter.Analytics.Infrastructure.Jobs;
 using Twitter.Analytics.Infrastructure.Serialization;
 
 namespace  Twitter.Analytics.Api
 {
-
     public class Program
     {
         public static void Main(string[] args)
@@ -37,6 +36,7 @@ namespace  Twitter.Analytics.Api
             services.AddMapperProfiles();
             services.AddRepositories();
             services.AddDynamoDBDependency();
+            services.AddHostedService<ExtractTweetJob>();
         }
 
         public static void Configure(WebApplication app)

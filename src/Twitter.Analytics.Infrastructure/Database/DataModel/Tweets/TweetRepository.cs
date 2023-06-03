@@ -33,6 +33,23 @@ namespace Twitter.Analytics.Infrastructure.Database.DataModel.Tweets
             return tweet;
         }
 
+        public async Task<List<Tweet>> CreateFromList(List<Tweet> tweets)
+        {
+            var batch = _dbContext.CreateBatchWrite<TweetModel>();
+            var tweetsModel = _mapper.Map<List<TweetModel>>(tweets.DistinctBy(x => x.Id).ToList());
+
+            foreach (var tweet in tweetsModel)
+            {
+                var primaryKey = new TweetKey(tweet.Id);
+                primaryKey.AssignTo(tweet);
+            }
+
+            batch.AddPutItems(tweetsModel);
+            await batch.ExecuteAsync();
+
+            return tweets;
+        }
+
         public async Task<Tweet> FindById(string tweetId)
         {
             var primaryKey = new TweetKey(tweetId);

@@ -22,6 +22,7 @@ namespace Twitter.Analytics.Domain.Accounts.Entities
         public int TweetCount { get; set; }
         public int ListedCount { get; set; }
         public bool Verified { get; set; }
+        public bool IsProcessed { get; set; }
         public DateTimeOffset CreatedAt { get; set; }
 
         public List<Tweet> Published { get; set; }

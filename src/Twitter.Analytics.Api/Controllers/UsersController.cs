@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -9,12 +6,9 @@ using CsvHelper;
 using CsvHelper.Configuration;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using Twitter.Analytics.Domain.Accounts;
 using Twitter.Analytics.Domain.Accounts.Entities;
 using Twitter.Analytics.Domain.Accounts.Models;
-using Twitter.Analytics.Domain.Tweets.Entities;
-using Twitter.Analytics.Domain.Tweets.Models;
 
 namespace Twitter.Analytics.Api.Controllers
 {
@@ -37,25 +31,31 @@ namespace Twitter.Analytics.Api.Controllers
                     return BadRequest("No file uploaded.");
                 }
 
-                var config = new CsvConfiguration(CultureInfo.InvariantCulture)
-                {
-                };
+                var config = new CsvConfiguration(CultureInfo.InvariantCulture);
 
                 using (var reader = new StreamReader(csvFile.OpenReadStream()))
                 using (var csv = new CsvReader(reader, config))
                 {
                     csv.Context.RegisterClassMap<AccountMap>();
-                    var tweets = csv.GetRecords<Account>().ToList();
+                    var accounts = csv.GetRecords<Account>().ToList();
 
-                    await _accountService.CreateFromList(tweets);
+                    await _accountService.CreateFromList(accounts);
 
-                    return Ok(tweets);
+                    return Ok(accounts);
                 }
             }
             catch (System.Exception ex)
             {
                 return NoContent();
             }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> FindAll()
+        {
+            var response = await _accountService.FindAll();
+
+            return Ok(response);
         }
     }
 }

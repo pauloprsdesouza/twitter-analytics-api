@@ -54,13 +54,16 @@ namespace Twitter.Analytics.Infrastructure.Database
             return this;
         }
 
-        public async Task<List<T>> Build(bool backwardSearch = true)
+        public async Task<List<T>> Build(int? total = null)
         {
             var queryConfig = new QueryOperationConfig
             {
                 Filter = filter,
-                BackwardSearch = backwardSearch
+                BackwardSearch = true,
             };
+
+            if (total.HasValue)
+                queryConfig.Limit = total.Value;
 
             return await _dbContext.FromQueryAsync<T>(queryConfig).GetRemainingAsync();
         }
