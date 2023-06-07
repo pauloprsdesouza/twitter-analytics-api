@@ -4,10 +4,10 @@ namespace Twitter.Analytics.Infrastructure.Database.DataModel.Users
 {
     public class AccountKey : BaseKey<AccountModel>
     {
-        public AccountKey(string accountId)
+        public AccountKey(AccountModel accountModel)
         {
             PK = $"Account";
-            SK = $"Id#{accountId}";
+            SK = $"{accountModel.Id}";
         }
 
         public AccountKey()

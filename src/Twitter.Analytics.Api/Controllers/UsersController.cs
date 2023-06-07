@@ -49,13 +49,5 @@ namespace Twitter.Analytics.Api.Controllers
                 return NoContent();
             }
         }
-
-        [HttpGet]
-        public async Task<IActionResult> FindAll()
-        {
-            var response = await _accountService.FindAll();
-
-            return Ok(response);
-        }
     }
 }

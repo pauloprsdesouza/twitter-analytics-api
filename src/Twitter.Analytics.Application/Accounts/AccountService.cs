@@ -14,11 +14,6 @@ namespace Twitter.Analytics.Application.Accounts
             _accountRepository = accountRepository;
         }
 
-         public async Task<List<Account>> FindAll()
-        {
-            return await _accountRepository.FindAllUnprocessed(10);
-        }
-
         public async Task<Account> Create(Account account)
         {
             return await _accountRepository.Create(account);
@@ -29,9 +24,9 @@ namespace Twitter.Analytics.Application.Accounts
             return await _accountRepository.CreateFromList(accounts);
         }
 
-        public async Task<Account> FindById(string accountId)
+        public async Task<List<Account>> FindAllUnprocessed()
         {
-            return await _accountRepository.FindById(accountId);
+            return await _accountRepository.FindAllUnprocessed();
         }
     }
 }

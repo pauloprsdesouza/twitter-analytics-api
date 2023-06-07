@@ -5,6 +5,9 @@ using AutoMapper;
 using Twitter.Analytics.Domain.Tweets;
 using Twitter.Analytics.Domain.Tweets.Entities;
 using Twitter.Analytics.Domain.TwitterApi;
+using System;
+using Twitter.Analytics.Domain.Accounts;
+using Microsoft.Extensions.Logging;
 
 namespace Twitter.Analytics.Application.Tweets
 {
@@ -12,13 +15,17 @@ namespace Twitter.Analytics.Application.Tweets
     {
         private readonly ITwitterApiProvider _twitterApi;
         private readonly ITweetRepository _tweetRepository;
+        private readonly IAccountRepository _accountRepository;
         private readonly IMapper _mapper;
+        private readonly ILogger<TweetService> _logger;
 
-        public TweetService(ITwitterApiProvider twitterApi, ITweetRepository tweetRepository, IMapper mapper)
+        public TweetService(ITwitterApiProvider twitterApi, ITweetRepository tweetRepository, IMapper mapper, IAccountRepository accountRepository, ILogger<TweetService> logger)
         {
             _twitterApi = twitterApi;
             _tweetRepository = tweetRepository;
             _mapper = mapper;
+            _accountRepository = accountRepository;
+            _logger = logger;
         }
 
         public async Task<List<Tweet>> CreateFromList(List<Tweet> tweets)
@@ -26,31 +33,10 @@ namespace Twitter.Analytics.Application.Tweets
             return await _tweetRepository.CreateFromList(tweets);
         }
 
-        public async Task<List<Tweet>> GetMentionsFromAccount(string username)
-        {
-            var response = await _twitterApi.GetMentionsFromAccount(username);
-
-            var tweets = _mapper.Map<List<Tweet>>(response.Data);
-            if (tweets.Any())
-                await _tweetRepository.CreateFromList(tweets);
-
-            return tweets;
-        }
-
-        public async Task<List<Tweet>> GetPublishedTweetsFromAccount(string accountId)
-        {
-            var response = await _twitterApi.GetPublishedTweetsFromAccount(accountId);
-
-            var tweets = _mapper.Map<List<Tweet>>(response.Data);
-            if (tweets.Any())
-                await _tweetRepository.CreateFromList(tweets);
-
-            return tweets;
-        }
-
-        public async Task<List<Tweet>> GetRepliesFromAccount(string username)
+        public async Task<List<Tweet>> ExtractReplies(string username)
         {
             var response = await _twitterApi.GetRepliesFromAccount(username);
+            if (response is null) return null;
 
             var tweets = _mapper.Map<List<Tweet>>(response.Data);
             if (tweets.Any())
@@ -59,12 +45,51 @@ namespace Twitter.Analytics.Application.Tweets
             return tweets;
         }
 
-        public async Task<List<Tweet>> GetTweetsFromIds(List<long> ids)
+        public async Task<List<Tweet>> ExtractMentionsFromAccount(string username)
+        {
+            var response = await _twitterApi.GetMentionsFromAccount(username);
+            if (response is null) return null;
+
+            var tweets = _mapper.Map<List<Tweet>>(response.Data);
+            if (tweets.Any())
+                await _tweetRepository.CreateFromList(tweets);
+
+            return tweets;
+        }
+
+        public async Task<List<Tweet>> ExtractPublishedTweetsFromAccount(string accountId)
+        {
+            var response = await _twitterApi.GetPublishedTweetsFromAccount(accountId);
+            if (response is null) return null;
+
+            var tweets = _mapper.Map<List<Tweet>>(response.Data);
+            if (tweets.Any())
+                await _tweetRepository.CreateFromList(tweets);
+
+            return tweets;
+        }
+
+        public async Task<List<Tweet>> GetRepliesByAccount(string accountId)
+        {
+            return await _tweetRepository.GetRepliesByUser(accountId);
+        }
+
+        public async Task<List<Tweet>> GetMentionsByAccount(string accountId)
+        {
+            return await _tweetRepository.GetMentionsByUser(accountId);
+        }
+
+        public async Task<List<Tweet>> GetTweetsByAccount(string accountId)
+        {
+            return await _tweetRepository.GetByAuthorId(accountId);
+        }
+
+        public async Task<List<Tweet>> ExtractTweetsFromIds(List<long> ids)
         {
             var tweetResponseModel = await _twitterApi.GetTweetsFromIds(ids);
             if (tweetResponseModel is null) return null;
 
-            return _mapper.Map<List<Tweet>>(tweetResponseModel.GetTweets()); ;
+            return _mapper.Map<List<Tweet>>(tweetResponseModel.GetTweets());
         }
     }
 }

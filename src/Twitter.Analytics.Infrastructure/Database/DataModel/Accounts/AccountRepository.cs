@@ -24,7 +24,7 @@ namespace Twitter.Analytics.Infrastructure.Database.DataModel.Users
         {
             var accountModel = _mapper.Map<AccountModel>(account);
 
-            var primaryKey = new AccountKey(account.Id);
+            var primaryKey = new AccountKey();
             primaryKey.AssignTo(accountModel);
 
             await _dbContext.SaveAsync(accountModel);
@@ -39,7 +39,7 @@ namespace Twitter.Analytics.Infrastructure.Database.DataModel.Users
 
             foreach (var account in accountsModel)
             {
-                var primaryKey = new AccountKey(account.Id);
+                var primaryKey = new AccountKey(account);
                 primaryKey.AssignTo(account);
             }
 
@@ -49,25 +49,45 @@ namespace Twitter.Analytics.Infrastructure.Database.DataModel.Users
             return accounts;
         }
 
-        public async Task<List<Account>> FindAllUnprocessed(int total)
+        public async Task<List<Account>> FindAllUnprocessed()
         {
             var primaryKey = new AccountKey();
             var accountsModel = await new DynamoDbQueryBuilder<AccountModel>(primaryKey, _dbContext)
-                                                .Build(5);
+                                        .AddCondition(nameof(AccountModel.IsProcessed), QueryOperator.Equal, new DynamoDBBool(false))
+                                        .Build();
 
             var accounts = _mapper.Map<List<Account>>(accountsModel);
 
-            return accounts.Take(5).ToList();
+            return accounts;
         }
 
-        public async Task<Account> FindById(string accountId)
+        public async Task<Account> Update(Account account)
         {
-            var primaryKey = new AccountKey(accountId);
-            var accountModel = await _dbContext.LoadAsync<AccountModel>(primaryKey.PK, primaryKey.SK);
+            var accountModel = _mapper.Map<AccountModel>(account);
 
-            var account = _mapper.Map<Account>(accountModel);
+            var primaryKey = new AccountKey(accountModel);
+            primaryKey.AssignTo(accountModel);
+
+            await _dbContext.SaveAsync(accountModel);
 
             return account;
+        }
+
+        public async Task<List<Account>> UpdateFromList(List<Account> accounts)
+        {
+            var batch = _dbContext.CreateBatchWrite<AccountModel>();
+            var accountsModel = _mapper.Map<List<AccountModel>>(accounts.DistinctBy(x => x.Id).ToList());
+
+            foreach (var account in accountsModel)
+            {
+                var primaryKey = new AccountKey(account);
+                primaryKey.AssignTo(account);
+            }
+
+            batch.AddPutItems(accountsModel);
+            await batch.ExecuteAsync();
+
+            return accounts;
         }
     }
 }

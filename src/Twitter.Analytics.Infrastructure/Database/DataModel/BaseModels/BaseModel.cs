@@ -12,10 +12,10 @@ namespace Twitter.Analytics.Infrastructure.Database.DataModel.BaseModels
         [DynamoDBRangeKey]
         public string SK { get; set; }
 
-        [DynamoDBGlobalSecondaryIndexHashKey]
+        [DynamoDBGlobalSecondaryIndexHashKey("GSIPK")]
         public string GSIPK { get; set; }
 
-        [DynamoDBGlobalSecondaryIndexRangeKey]
+        [DynamoDBGlobalSecondaryIndexRangeKey("GSISK")]
         public string GSISK { get; set; }
 
         [DynamoDBProperty(typeof(DateTimeOffsetConverter))]

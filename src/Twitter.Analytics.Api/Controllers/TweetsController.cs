@@ -1,6 +1,4 @@
 using System.Linq;
-using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Net.Mime;
@@ -9,8 +7,6 @@ using CsvHelper;
 using CsvHelper.Configuration;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Twitter.Analytics.Domain.Accounts.Entities;
-using Twitter.Analytics.Domain.Accounts.Models;
 using Twitter.Analytics.Domain.Tweets;
 using Twitter.Analytics.Domain.Tweets.Entities;
 using Twitter.Analytics.Domain.Tweets.Models;
@@ -27,7 +23,7 @@ namespace Twitter.Analytics.Api.Controllers
             _tweetService = tweetService;
         }
 
-        [HttpPost]
+        [HttpPost, Route("csv")]
         [Produces(MediaTypeNames.Application.Json)]
         public async Task<IActionResult> SaveTweetsFromCsv(IFormFile csvFile)
         {
@@ -55,6 +51,15 @@ namespace Twitter.Analytics.Api.Controllers
             {
                 return NoContent();
             }
+        }
+
+        [HttpPost, Route("extract-from-unprocessed-users")]
+        [Produces(MediaTypeNames.Application.Json)]
+        public async Task<IActionResult> ExtractPublishedTweets()
+        {
+            var tweets = await _tweetService.GetRepliesByAccount("12354");
+
+            return Ok();
         }
     }
 }

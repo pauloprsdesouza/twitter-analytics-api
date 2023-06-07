@@ -6,9 +6,10 @@ namespace Twitter.Analytics.Domain.Accounts
 {
     public interface IAccountRepository
     {
-        Task<Account> FindById(string accountId);
         Task<Account> Create(Account account);
-        Task<List<Account>> FindAllUnprocessed(int total);
+        Task<Account> Update(Account account);
+        Task<List<Account>> FindAllUnprocessed();
         Task<List<Account>> CreateFromList(List<Account> accounts);
+        Task<List<Account>> UpdateFromList(List<Account> accounts);
     }
 }

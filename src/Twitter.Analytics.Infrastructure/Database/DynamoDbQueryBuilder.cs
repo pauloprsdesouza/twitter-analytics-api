@@ -22,13 +22,11 @@ namespace Twitter.Analytics.Infrastructure.Database
             filter.AddCondition(DynamoDbTable.PK, QueryOperator.Equal, primaryKey.PK);
         }
 
-        public DynamoDbQueryBuilder<T> AddCondition(string attributeName, QueryOperator queryOperator, object value)
+        public DynamoDbQueryBuilder<T> AddCondition(string attributeName, QueryOperator queryOperator, DynamoDBEntry value)
         {
             if (value is not null)
             {
-                var attributeValue = new AttributeValue(value.ToString());
-
-                filter.AddCondition(attributeName, queryOperator, new List<AttributeValue>() { attributeValue });
+                filter.AddCondition(attributeName, queryOperator, value);
             }
 
             return this;
@@ -54,16 +52,13 @@ namespace Twitter.Analytics.Infrastructure.Database
             return this;
         }
 
-        public async Task<List<T>> Build(int? total = null)
+        public async Task<List<T>> Build()
         {
             var queryConfig = new QueryOperationConfig
             {
                 Filter = filter,
-                BackwardSearch = true,
+                BackwardSearch = true
             };
-
-            if (total.HasValue)
-                queryConfig.Limit = total.Value;
 
             return await _dbContext.FromQueryAsync<T>(queryConfig).GetRemainingAsync();
         }

@@ -11,6 +11,10 @@ namespace Twitter.Analytics.Infrastructure.Database.DataModel.Tweets
         [DynamoDBProperty]
         public string Id { get; set; }
 
+
+        [DynamoDBProperty]
+        public string AuthorId { get; set; }
+
         [DynamoDBProperty]
         public string Text { get; set; }
 

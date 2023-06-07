@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -21,6 +23,16 @@ namespace Twitter.Analytics.Infrastructure.TwitterApi
             _client = client;
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", twitterCredential.Value.BearerToken);
             _logger = logger;
+        }
+
+        private bool IsAvailable(HttpResponseMessage response)
+        {
+            var limitRemaining = response.Headers.GetValues("x-rate-limit-remaining").FirstOrDefault();
+            var whenWillReset = DateTimeOffset.FromUnixTimeSeconds(long.Parse(response.Headers.GetValues("x-rate-limit-reset").FirstOrDefault()));
+
+            var remainigTime = whenWillReset - DateTimeOffset.UtcNow;
+
+            return remainigTime.Minutes > 1;
         }
 
         public async Task<TweetResponseModel> GetTweetsFromIds(List<long> ids)
@@ -78,7 +90,7 @@ namespace Twitter.Analytics.Infrastructure.TwitterApi
 
             try
             {
-                var response = await _client.GetAsync($"search{param}");
+                var response = await _client.GetAsync($"tweets/search/recent{param}");
                 response.EnsureSuccessStatusCode();
 
                 return await response.ReadAsJsonAsync<TweetResponseModel>();
@@ -101,7 +113,7 @@ namespace Twitter.Analytics.Infrastructure.TwitterApi
 
             try
             {
-                var response = await _client.GetAsync($"search{param}");
+                var response = await _client.GetAsync($"tweets/search/recent{param}");
                 response.EnsureSuccessStatusCode();
 
                 return await response.ReadAsJsonAsync<TweetResponseModel>();

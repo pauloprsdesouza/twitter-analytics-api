@@ -7,8 +7,11 @@ namespace Twitter.Analytics.Domain.Tweets
     public interface ITweetRepository
     {
         Task<List<Tweet>> GetByAuthorId(string authorId);
-        Task<Tweet> FindById(string tweetId);
+        Task<List<Tweet>> GetRepliesByUser(string userId);
+        Task<List<Tweet>> GetMentionsByUser(string userId);
         Task<Tweet> Create(Tweet tweet);
         Task<List<Tweet>> CreateFromList(List<Tweet> tweets);
+        Task<List<Tweet>> CreateMentionsFromList(string toAccountId, List<Tweet> tweets);
+        Task<List<Tweet>> CreateRepliesFromList(string toAccountId, List<Tweet> tweets);
     }
 }

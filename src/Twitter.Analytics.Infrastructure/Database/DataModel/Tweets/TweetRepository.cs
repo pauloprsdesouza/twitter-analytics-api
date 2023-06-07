@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Amazon.DynamoDBv2.DataModel;
-using Amazon.DynamoDBv2.DocumentModel;
 using AutoMapper;
 using Twitter.Analytics.Domain.Tweets;
 using Twitter.Analytics.Domain.Tweets.Entities;
@@ -40,7 +39,7 @@ namespace Twitter.Analytics.Infrastructure.Database.DataModel.Tweets
 
             foreach (var tweet in tweetsModel)
             {
-                var primaryKey = new TweetKey(tweet.Id);
+                var primaryKey = new TweetKey(tweet.Id, tweet.AuthorId);
                 primaryKey.AssignTo(tweet);
             }
 
@@ -50,21 +49,62 @@ namespace Twitter.Analytics.Infrastructure.Database.DataModel.Tweets
             return tweets;
         }
 
-        public async Task<Tweet> FindById(string tweetId)
+        public async Task<List<Tweet>> CreateMentionsFromList(string toAccountId, List<Tweet> tweets)
         {
-            var primaryKey = new TweetKey(tweetId);
-            var tweetModel = await _dbContext.LoadAsync<TweetModel>(primaryKey.PK, primaryKey.SK);
+            var batch = _dbContext.CreateBatchWrite<TweetModel>();
+            var tweetsModel = _mapper.Map<List<TweetModel>>(tweets.DistinctBy(x => x.Id).ToList());
 
-            var tweet = _mapper.Map<Tweet>(tweetModel);
+            foreach (var tweet in tweetsModel)
+            {
+                var primaryKey = new MentionKey(toAccountId, tweet.AuthorId, tweet.Id);
+                primaryKey.AssignTo(tweet);
+            }
 
-            return tweet;
+            batch.AddPutItems(tweetsModel);
+            await batch.ExecuteAsync();
+
+            return tweets;
+        }
+
+        public async Task<List<Tweet>> CreateRepliesFromList(string toAccountId, List<Tweet> tweets)
+        {
+            var batch = _dbContext.CreateBatchWrite<TweetModel>();
+            var tweetsModel = _mapper.Map<List<TweetModel>>(tweets.DistinctBy(x => x.Id).ToList());
+
+            foreach (var tweet in tweetsModel)
+            {
+                var primaryKey = new ReplyKey(toAccountId, tweet.AuthorId, tweet.Id);
+                primaryKey.AssignTo(tweet);
+            }
+
+            batch.AddPutItems(tweetsModel);
+            await batch.ExecuteAsync();
+
+            return tweets;
         }
 
         public async Task<List<Tweet>> GetByAuthorId(string authorId)
         {
-            var primaryKey = new TweetKey();
+            var primaryKey = new TweetKey(authorId);
             var tweetsModel = await new DynamoDbQueryBuilder<TweetModel>(primaryKey, _dbContext)
-                                    .AddCondition(nameof(Tweet.AuthorId), QueryOperator.Equal, authorId)
+                                    .Build();
+
+            return _mapper.Map<List<Tweet>>(tweetsModel);
+        }
+
+        public async Task<List<Tweet>> GetMentionsByUser(string toUserId)
+        {
+            var primaryKey = new MentionKey(toUserId);
+            var tweetsModel = await new DynamoDbQueryBuilder<TweetModel>(primaryKey, _dbContext)
+                                    .Build();
+
+            return _mapper.Map<List<Tweet>>(tweetsModel);
+        }
+
+        public async Task<List<Tweet>> GetRepliesByUser(string toUserId)
+        {
+            var primaryKey = new ReplyKey(toUserId);
+            var tweetsModel = await new DynamoDbQueryBuilder<TweetModel>(primaryKey, _dbContext)
                                     .Build();
 
             return _mapper.Map<List<Tweet>>(tweetsModel);

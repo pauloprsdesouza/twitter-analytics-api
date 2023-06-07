@@ -6,10 +6,13 @@ namespace Twitter.Analytics.Domain.Tweets
 {
     public interface ITweetService
     {
-        Task<List<Tweet>> GetTweetsFromIds(List<long> ids);
+        Task<List<Tweet>> GetTweetsByAccount(string accountId);
+        Task<List<Tweet>> GetMentionsByAccount(string accountId);
+        Task<List<Tweet>> ExtractTweetsFromIds(List<long> ids);
         Task<List<Tweet>> CreateFromList(List<Tweet> tweets);
-        Task<List<Tweet>> GetMentionsFromAccount(string username);
-        Task<List<Tweet>> GetRepliesFromAccount(string username);
-        Task<List<Tweet>> GetPublishedTweetsFromAccount(string accountId);
+        Task<List<Tweet>> ExtractMentionsFromAccount(string username);
+        Task<List<Tweet>> ExtractReplies(string username);
+        Task<List<Tweet>> GetRepliesByAccount(string username);
+        Task<List<Tweet>> ExtractPublishedTweetsFromAccount(string accountId);
     }
 }
