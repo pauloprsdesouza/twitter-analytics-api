@@ -6,7 +6,7 @@ namespace Twitter.Analytics.Domain.TwitterApi.Models.Users
     {
         public string Id { get; set; }
         public string Name { get; set; }
-        public string UserName { get; set; }
+        public string Username { get; set; }
         public bool Protected { get; set; }
         public bool Verified { get; set; }
         public string Description { get; set; }

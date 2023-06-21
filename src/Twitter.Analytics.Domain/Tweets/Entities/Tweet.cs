@@ -15,12 +15,35 @@ namespace Twitter.Analytics.Domain.Tweets.Entities
         public int QuoteCount { get; set; }
         public int ImpressionCount { get; set; }
         public TweetType Type { get; set; }
+        public double ContextScore { get; set; }
+        public double DiversityScore { get; set; }
+        public double SentimentScore { get; set; }
+        public List<string> Tokens { get; set; }
         public List<string> Urls { get; set; }
         public List<string> Mentions { get; set; }
+        public List<string> Hashtags { get; set; }
+        public List<string> Domains { get; set; }
+        public List<string> Entities { get; set; }
         public DateTimeOffset CreatedAt { get; set; }
-
         public int EngagementScore => RetweetCount + ReplyCount + LikeCount + QuoteCount + ImpressionCount;
 
         public Account Author { get; set; }
+
+        public double RecencyScore => CalculateRecencyScore();
+        public double SocialCapitalScore => CalculateSocialCapitalScore();
+
+        private double CalculateRecencyScore()
+        {
+            var ageInSeconds = DateTimeOffset.UtcNow.Subtract(CreatedAt).TotalSeconds;
+
+            var decayFactor = 0.1;
+
+            return 1 / (1 + decayFactor * Math.Log10(1 + ageInSeconds));
+        }
+
+        public double CalculateSocialCapitalScore()
+        {
+            return (Author.EngagementStrengthScore + RetweetCount + EngagementScore + Hashtags.Count + Urls.Count + DiversityScore + ContextScore + Tokens.Count) * RecencyScore;
+        }
     }
 }

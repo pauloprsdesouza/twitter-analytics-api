@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Amazon.DynamoDBv2.DataModel;
 using Twitter.Analytics.Domain.Tweets.Entities;
 using Twitter.Analytics.Infrastructure.Database.Converters;
@@ -10,7 +11,6 @@ namespace Twitter.Analytics.Infrastructure.Database.DataModel.Tweets
     {
         [DynamoDBProperty]
         public string Id { get; set; }
-
 
         [DynamoDBProperty]
         public string AuthorId { get; set; }
@@ -38,5 +38,17 @@ namespace Twitter.Analytics.Infrastructure.Database.DataModel.Tweets
 
         [DynamoDBProperty(typeof(EnumConverter<TweetType>))]
         public TweetType Type { get; set; }
+
+        [DynamoDBProperty]
+        public decimal ContextScore { get; set; }
+
+        [DynamoDBProperty]
+        public int DiversityScore { get; set; }
+
+        [DynamoDBProperty]
+        public int SentimentScore { get; set; }
+
+        [DynamoDBProperty]
+        public List<string> Tokens { get; set; }
     }
 }

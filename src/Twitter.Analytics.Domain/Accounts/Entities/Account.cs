@@ -26,9 +26,13 @@ namespace Twitter.Analytics.Domain.Accounts.Entities
         public DateTimeOffset CreatedAt { get; set; }
 
         public List<Tweet> Published { get; set; }
+        public List<Tweet> Mentions { get; set; }
+        public List<Tweet> Replies { get; set; }
 
         public double RecencyScore => CalculateRecencyScore();
         public double InfluenceScore => CalculateInfluenceScore();
+        public double ReputationScore => CalculateReputation();
+        public double EngagementStrengthScore => InfluenceScore * ReputationScore;
 
         private double CalculateRecencyScore()
         {
@@ -49,6 +53,58 @@ namespace Twitter.Analytics.Domain.Accounts.Entities
             }
 
             return 0;
+        }
+
+        private double CalculateReputation()
+        {
+            var positiveSentiment = 0.0;
+            var negativeSentiment = 0.0;
+            var reputationScore = 0.0;
+
+            foreach (var mention in Mentions)
+            {
+                var result = CalculateSentimentScore(mention);
+
+                positiveSentiment += result.Item1;
+                negativeSentiment += result.Item1;
+            }
+
+            foreach (var reply in Replies)
+            {
+                var result = CalculateSentimentScore(reply);
+
+                positiveSentiment += result.Item1;
+                negativeSentiment += result.Item1;
+            }
+
+            if ((positiveSentiment + negativeSentiment) > 0.0)
+                reputationScore = positiveSentiment / (positiveSentiment + negativeSentiment);
+            else
+                reputationScore = 0.0;
+
+            var fineAdjustment = 0.01;
+            var normalizedReputationScore = (reputationScore + ListedCount * fineAdjustment) / (1.0 + (ListedCount * fineAdjustment));
+
+            return normalizedReputationScore;
+        }
+
+        private (double, double) CalculateSentimentScore(Tweet tweet)
+        {
+            var positiveSentiment = 0;
+            var negativeSentiment = 0;
+
+            if (tweet.AuthorId != Id)
+                switch (tweet.SentimentScore)
+                {
+                    case > 0:
+                        positiveSentiment++;
+                        break;
+                    case < 0:
+                        negativeSentiment++;
+                        break;
+                }
+
+            return (positiveSentiment, negativeSentiment);
         }
     }
 }

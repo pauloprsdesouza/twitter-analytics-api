@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Twitter.Analytics.Domain.TwitterApi.Models.Annotations;
+using Twitter.Analytics.Domain.TwitterApi.Models.Entities;
 using Twitter.Analytics.Domain.TwitterApi.Models.Users;
 
 namespace Twitter.Analytics.Domain.TwitterApi.Models.Tweets
@@ -18,5 +19,11 @@ namespace Twitter.Analytics.Domain.TwitterApi.Models.Tweets
 
         public TweetPublicMetricModel PublicMetrics { get; set; }
         public List<ContextAnnotation> ContextAnnotations { get; set; }
+        public EntityDetailModel Entities { get; set; }
+
+        public TweetModel()
+        {
+            ContextAnnotations = new();
+        }
     }
 }

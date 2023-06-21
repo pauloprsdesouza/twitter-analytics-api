@@ -11,5 +11,6 @@ namespace Twitter.Analytics.Domain.Accounts
         Task<List<Account>> FindAllUnprocessed();
         Task<List<Account>> CreateFromList(List<Account> accounts);
         Task<List<Account>> UpdateFromList(List<Account> accounts);
+        Task<List<Account>> ExtractAccounts(List<string> accountIds);
     }
 }

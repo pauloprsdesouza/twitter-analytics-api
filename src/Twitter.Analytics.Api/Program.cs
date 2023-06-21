@@ -23,6 +23,7 @@ namespace  Twitter.Analytics.Api
             services.AddDefaultAWSOptions(configuration.GetAWSOptions());
             services.AddControllers(options =>
             {
+
                 options.Filters.Add(typeof(ExceptionFilter));
                 options.Filters.Add(typeof(RequestValidationFilter));
                 options.Filters.Add(typeof(NotificationFilter));

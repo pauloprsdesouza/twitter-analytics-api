@@ -83,6 +83,23 @@ namespace Twitter.Analytics.Infrastructure.Database.DataModel.Tweets
             return tweets;
         }
 
+        public async Task<List<Tweet>> FindAllTweets(List<string> usersId)
+        {
+            var requests = new List<Task<List<TweetModel>>>();
+            foreach (var userId in usersId)
+            {
+                var mentionKey = new MentionKey(userId);
+                requests.Add(new DynamoDbQueryBuilder<TweetModel>(mentionKey, _dbContext).Build());
+
+                var replyKey = new ReplyKey(userId);
+                requests.Add(new DynamoDbQueryBuilder<TweetModel>(replyKey, _dbContext).Build());
+            }
+
+            var responses = await Task.WhenAll(requests);
+
+            return _mapper.Map<List<Tweet>>(responses.SelectMany(x => x.ToList()));
+        }
+
         public async Task<List<Tweet>> GetByAuthorId(string authorId)
         {
             var primaryKey = new TweetKey(authorId);

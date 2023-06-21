@@ -10,6 +10,7 @@ using Microsoft.Extensions.Options;
 using Twitter.Analytics.Domain.TwitterApi;
 using Twitter.Analytics.Domain.TwitterApi.Models;
 using Twitter.Analytics.Infrastructure.TwitterApi.HttpWebClient;
+using Twitter.Analytics.Domain.TwitterApi.Models.Users;
 
 namespace Twitter.Analytics.Infrastructure.TwitterApi
 {
@@ -117,6 +118,29 @@ namespace Twitter.Analytics.Infrastructure.TwitterApi
                 response.EnsureSuccessStatusCode();
 
                 return await response.ReadAsJsonAsync<TweetResponseModel>();
+            }
+            catch (System.Exception ex)
+            {
+                _logger.LogError(ex, "UNABLE_TO_GET_TWEETS");
+                return null;
+            }
+        }
+
+        public async Task<List<UserModel>> GetAccounts(List<string> accountIds)
+        {
+            var param = new QueryBuilder();
+            param.Add("ids", string.Join(",", accountIds));
+            param.Add("user.fields", "created_at,entities,id,location,name,pinned_tweet_id,profile_image_url,protected,public_metrics,url,username,verified");
+
+            try
+            {
+                var response = await _client.GetAsync($"users{param}");
+                response.EnsureSuccessStatusCode();
+
+                var data = await response.ReadAsJsonAsync<UserDataModel>();
+                if(data is null) return null;
+
+                return data.Data;
             }
             catch (System.Exception ex)
             {

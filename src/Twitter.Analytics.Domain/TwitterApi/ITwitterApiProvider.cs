@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Twitter.Analytics.Domain.TwitterApi.Models;
+using Twitter.Analytics.Domain.TwitterApi.Models.Users;
 
 namespace Twitter.Analytics.Domain.TwitterApi
 {
@@ -10,5 +11,6 @@ namespace Twitter.Analytics.Domain.TwitterApi
         Task<TweetResponseModel> GetRepliesFromAccount(string username);
         Task<TweetResponseModel> GetTweetsFromIds(List<long> ids);
         Task<TweetResponseModel> GetPublishedTweetsFromAccount(string accountId);
+        Task<List<UserModel>> GetAccounts(List<string> accountIds);
     }
 }
