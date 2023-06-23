@@ -12,6 +12,7 @@ namespace Twitter.Analytics.Domain.Tweets
         Task<List<Tweet>> GetMentionsByUser(string userId);
         Task<Tweet> Create(Tweet tweet);
         Task<List<Tweet>> CreateFromList(List<Tweet> tweets);
+        Task<List<Tweet>> UpdateFromList(List<Tweet> tweets);
         Task<List<Tweet>> CreateMentionsFromList(string toAccountId, List<Tweet> tweets);
         Task<List<Tweet>> CreateRepliesFromList(string toAccountId, List<Tweet> tweets);
     }

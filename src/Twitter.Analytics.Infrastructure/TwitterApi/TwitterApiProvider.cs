@@ -36,7 +36,7 @@ namespace Twitter.Analytics.Infrastructure.TwitterApi
             return remainigTime.Minutes > 1;
         }
 
-        public async Task<TweetResponseModel> GetTweetsFromIds(List<long> ids)
+        public async Task<TweetResponseModel> GetTweetsFromIds(List<string> ids)
         {
             var param = new QueryBuilder();
             param.Add("ids", string.Join(",", ids));

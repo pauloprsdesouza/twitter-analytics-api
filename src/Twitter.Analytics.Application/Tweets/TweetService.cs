@@ -69,6 +69,42 @@ namespace Twitter.Analytics.Application.Tweets
             return tweets;
         }
 
+        public async Task<List<Tweet>> UpdateTweets(List<Tweet> tweets)
+        {
+            var ids = tweets.Select(x => x.Id).ToList();
+            var tweetsExtracted = await ExtractTweetsFromIds(ids);
+            if (tweetsExtracted.Any())
+            {
+                var tweetsToUpdate = _mapper.Map<List<Tweet>>(tweetsExtracted);
+
+                foreach (var tweetExtracted in tweetsToUpdate)
+                {
+                    var tweetToUpdate = tweets.SingleOrDefault(x => x.Id == tweetExtracted.Id);
+                    if (tweetToUpdate is not null)
+                    {
+                        tweetToUpdate.Id = tweetExtracted.Id;
+                        tweetToUpdate.Text = tweetExtracted.Text;
+                        tweetToUpdate.AuthorId = tweetExtracted.AuthorId;
+                        tweetToUpdate.RetweetCount = tweetExtracted.RetweetCount;
+                        tweetToUpdate.ReplyCount = tweetExtracted.ReplyCount;
+                        tweetToUpdate.LikeCount = tweetExtracted.LikeCount;
+                        tweetToUpdate.QuoteCount = tweetExtracted.QuoteCount;
+                        tweetToUpdate.ImpressionCount = tweetExtracted.ImpressionCount;
+                        tweetToUpdate.Urls = tweetExtracted.Urls;
+                        tweetToUpdate.Mentions = tweetExtracted.Mentions;
+                        tweetToUpdate.Hashtags = tweetExtracted.Hashtags;
+                        tweetToUpdate.Domains = tweetExtracted.Domains;
+                        tweetToUpdate.Entities = tweetExtracted.Entities;
+                        tweetToUpdate.CreatedAt = tweetExtracted.CreatedAt;
+                    }
+                }
+
+                await _tweetRepository.UpdateFromList(tweetsToUpdate);
+            }
+
+            return tweetsExtracted;
+        }
+
         public async Task<List<Tweet>> GetRepliesByAccount(string accountId)
         {
             return await _tweetRepository.GetRepliesByUser(accountId);
@@ -84,7 +120,7 @@ namespace Twitter.Analytics.Application.Tweets
             return await _tweetRepository.GetByAuthorId(accountId);
         }
 
-        public async Task<List<Tweet>> ExtractTweetsFromIds(List<long> ids)
+        public async Task<List<Tweet>> ExtractTweetsFromIds(List<string> ids)
         {
             var tweetResponseModel = await _twitterApi.GetTweetsFromIds(ids);
             if (tweetResponseModel is null) return null;

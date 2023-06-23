@@ -93,6 +93,9 @@ namespace Twitter.Analytics.Infrastructure.Database.DataModel.Tweets
 
                 var replyKey = new ReplyKey(userId);
                 requests.Add(new DynamoDbQueryBuilder<TweetModel>(replyKey, _dbContext).Build());
+
+                var publishedKey = new TweetKey(userId);
+                requests.Add(new DynamoDbQueryBuilder<TweetModel>(publishedKey, _dbContext).Build());
             }
 
             var responses = await Task.WhenAll(requests);
@@ -125,6 +128,23 @@ namespace Twitter.Analytics.Infrastructure.Database.DataModel.Tweets
                                     .Build();
 
             return _mapper.Map<List<Tweet>>(tweetsModel);
+        }
+
+        public async Task<List<Tweet>> UpdateFromList(List<Tweet> tweets)
+        {
+            var batch = _dbContext.CreateBatchWrite<TweetModel>();
+            var tweetsModel = _mapper.Map<List<TweetModel>>(tweets.DistinctBy(x => x.Id).ToList());
+
+            foreach (var tweet in tweetsModel)
+            {
+                var primaryKey = new TweetKey(tweet.Id, tweet.AuthorId);
+                primaryKey.AssignTo(tweet);
+            }
+
+            batch.AddPutItems(tweetsModel);
+            await batch.ExecuteAsync();
+
+            return tweets;
         }
     }
 }

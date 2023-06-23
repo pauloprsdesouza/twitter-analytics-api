@@ -26,11 +26,10 @@ namespace Twitter.Analytics.Domain.Tweets.Entities
         public List<string> Entities { get; set; }
         public DateTimeOffset CreatedAt { get; set; }
         public int EngagementScore => RetweetCount + ReplyCount + LikeCount + QuoteCount + ImpressionCount;
-
-        public Account Author { get; set; }
-
         public double RecencyScore => CalculateRecencyScore();
         public double SocialCapitalScore => CalculateSocialCapitalScore();
+
+        public Account Author { get; set; }
 
         private double CalculateRecencyScore()
         {

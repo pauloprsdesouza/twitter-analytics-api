@@ -9,7 +9,7 @@ namespace Twitter.Analytics.Domain.TwitterApi
     {
         Task<TweetResponseModel> GetMentionsFromAccount(string username);
         Task<TweetResponseModel> GetRepliesFromAccount(string username);
-        Task<TweetResponseModel> GetTweetsFromIds(List<long> ids);
+        Task<TweetResponseModel> GetTweetsFromIds(List<string> ids);
         Task<TweetResponseModel> GetPublishedTweetsFromAccount(string accountId);
         Task<List<UserModel>> GetAccounts(List<string> accountIds);
     }

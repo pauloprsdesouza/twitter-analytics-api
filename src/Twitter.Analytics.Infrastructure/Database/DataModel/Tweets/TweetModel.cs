@@ -40,15 +40,36 @@ namespace Twitter.Analytics.Infrastructure.Database.DataModel.Tweets
         public TweetType Type { get; set; }
 
         [DynamoDBProperty]
-        public decimal ContextScore { get; set; }
+        public double ContextScore { get; set; }
 
         [DynamoDBProperty]
-        public int DiversityScore { get; set; }
+        public double DiversityScore { get; set; }
 
         [DynamoDBProperty]
-        public int SentimentScore { get; set; }
+        public double SentimentScore { get; set; }
 
         [DynamoDBProperty]
         public List<string> Tokens { get; set; }
+
+        [DynamoDBProperty]
+        public List<string> Urls { get; set; }
+
+        [DynamoDBProperty]
+        public List<string> Mentions { get; set; }
+
+        [DynamoDBProperty]
+        public List<string> Hashtags { get; set; }
+
+        [DynamoDBProperty]
+        public List<string> Domains { get; set; }
+
+        [DynamoDBProperty]
+        public List<string> Entities { get; set; }
+
+        [DynamoDBProperty]
+        public double RecencyScore { get; set; }
+
+        [DynamoDBProperty]
+        public double SocialCapitalScore { get; set; }
     }
 }
