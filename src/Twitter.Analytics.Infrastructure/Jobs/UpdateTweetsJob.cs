@@ -47,14 +47,22 @@ namespace Twitter.Analytics.Infrastructure.Jobs
                         accounts = await accountRepository.FindAllUnprocessed();
 
                     if (!tweets.Any())
-                        tweets = await tweetRepository.FindAllTweets(accounts.Select(x => x.Id).ToList());
+                    {
+                        tweets = await tweetRepository.FindAllTweets(accounts.Select(x => x.Id).Take(10).ToList());
+                        // foreach (var tweet in tweets)
+                        // {
+                        //     var author = accounts.SingleOrDefault(x => x.Id == tweet.AuthorId);
+                        //     if (author is not null)
+                        //         tweet.CalculateSocialCapitalScore(author);
+                        // }
+                    }
 
                     if (idsToBeIgnored.Count != tweets.Count)
                     {
                         var tweetsToBeUpdatedPaged = tweets.Where(x => !idsToBeIgnored.Contains(x.Id)).ToList().Take(100).ToList();
                         var tweetsToBeUpdated = await tweetService.UpdateTweets(tweetsToBeUpdatedPaged);
 
-                        if (tweetsToBeUpdated.Any())
+                        if (tweetsToBeUpdated is not null)
                             idsToBeIgnored.AddRange(tweetsToBeUpdated.Select(x => x.Id));
                     }
 

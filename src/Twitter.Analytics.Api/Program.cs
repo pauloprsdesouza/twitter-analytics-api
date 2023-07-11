@@ -31,6 +31,7 @@ namespace  Twitter.Analytics.Api
 
             services.AddSwaggerDocumentation();
             services.AddTwitterApi(configuration.GetSection("TwitterCredential"));
+            services.AddTextAnalysisApi();
             services.AddServices();
             services.AddNotifications();
             services.AddMapperProfiles();

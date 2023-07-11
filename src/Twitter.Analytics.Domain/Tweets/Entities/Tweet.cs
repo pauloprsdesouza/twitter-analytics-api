@@ -27,7 +27,7 @@ namespace Twitter.Analytics.Domain.Tweets.Entities
         public DateTimeOffset CreatedAt { get; set; }
         public int EngagementScore => RetweetCount + ReplyCount + LikeCount + QuoteCount + ImpressionCount;
         public double RecencyScore => CalculateRecencyScore();
-        public double SocialCapitalScore => CalculateSocialCapitalScore();
+        public double SocialCapitalScore { get; }
 
         public Account Author { get; set; }
 
@@ -40,9 +40,10 @@ namespace Twitter.Analytics.Domain.Tweets.Entities
             return 1 / (1 + decayFactor * Math.Log10(1 + ageInSeconds));
         }
 
-        public double CalculateSocialCapitalScore()
-        {
-            return (Author.EngagementStrengthScore + RetweetCount + EngagementScore + Hashtags.Count + Urls.Count + DiversityScore + ContextScore + Tokens.Count) * RecencyScore;
-        }
+        // public double CalculateSocialCapitalScore(Account author)
+        // {
+        //     Author = author;
+        //     return (Author.EngagementStrengthScore + RetweetCount + EngagementScore + Hashtags.Count + Urls.Count + DiversityScore + ContextScore + Tokens.Count) * RecencyScore;
+        // }
     }
 }

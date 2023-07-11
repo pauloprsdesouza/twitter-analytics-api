@@ -8,6 +8,7 @@ using Twitter.Analytics.Domain.TwitterApi;
 using System;
 using Twitter.Analytics.Domain.Accounts;
 using Microsoft.Extensions.Logging;
+using Twitter.Analytics.Domain.TextAnalysisApi;
 
 namespace Twitter.Analytics.Application.Tweets
 {
@@ -18,14 +19,16 @@ namespace Twitter.Analytics.Application.Tweets
         private readonly IAccountRepository _accountRepository;
         private readonly IMapper _mapper;
         private readonly ILogger<TweetService> _logger;
+        private readonly ITextAnalysisApi _textAnalysis;
 
-        public TweetService(ITwitterApiProvider twitterApi, ITweetRepository tweetRepository, IMapper mapper, IAccountRepository accountRepository, ILogger<TweetService> logger)
+        public TweetService(ITwitterApiProvider twitterApi, ITweetRepository tweetRepository, IMapper mapper, IAccountRepository accountRepository, ILogger<TweetService> logger, ITextAnalysisApi textAnalysis)
         {
             _twitterApi = twitterApi;
             _tweetRepository = tweetRepository;
             _mapper = mapper;
             _accountRepository = accountRepository;
             _logger = logger;
+            _textAnalysis = textAnalysis;
         }
 
         public async Task<List<Tweet>> CreateFromList(List<Tweet> tweets)
@@ -73,7 +76,7 @@ namespace Twitter.Analytics.Application.Tweets
         {
             var ids = tweets.Select(x => x.Id).ToList();
             var tweetsExtracted = await ExtractTweetsFromIds(ids);
-            if (tweetsExtracted.Any())
+            if (tweetsExtracted is not null)
             {
                 var tweetsToUpdate = _mapper.Map<List<Tweet>>(tweetsExtracted);
 
@@ -82,6 +85,7 @@ namespace Twitter.Analytics.Application.Tweets
                     var tweetToUpdate = tweets.SingleOrDefault(x => x.Id == tweetExtracted.Id);
                     if (tweetToUpdate is not null)
                     {
+                        var response = _textAnalysis.GetTextAnalysis(tweetExtracted.Text);
                         tweetToUpdate.Id = tweetExtracted.Id;
                         tweetToUpdate.Text = tweetExtracted.Text;
                         tweetToUpdate.AuthorId = tweetExtracted.AuthorId;
@@ -96,6 +100,10 @@ namespace Twitter.Analytics.Application.Tweets
                         tweetToUpdate.Domains = tweetExtracted.Domains;
                         tweetToUpdate.Entities = tweetExtracted.Entities;
                         tweetToUpdate.CreatedAt = tweetExtracted.CreatedAt;
+                        tweetToUpdate.ContextScore = tweetToUpdate.ContextScore;
+                        tweetToUpdate.DiversityScore = tweetToUpdate.DiversityScore;
+                        tweetToUpdate.SentimentScore = tweetToUpdate.SentimentScore;
+                        tweetToUpdate.Tokens = tweetToUpdate.Tokens;
                     }
                 }
 
