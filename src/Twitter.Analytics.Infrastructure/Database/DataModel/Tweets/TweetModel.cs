@@ -34,7 +34,7 @@ namespace Twitter.Analytics.Infrastructure.Database.DataModel.Tweets
         public int ImpressionCount { get; set; }
 
         [DynamoDBProperty]
-        public int EngagementScore { get; set; }
+        public double EngagementScore { get; set; }
 
         [DynamoDBProperty(typeof(EnumConverter<TweetType>))]
         public TweetType Type { get; set; }

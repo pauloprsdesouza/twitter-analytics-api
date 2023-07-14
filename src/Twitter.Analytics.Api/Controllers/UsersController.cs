@@ -41,7 +41,7 @@ namespace Twitter.Analytics.Api.Controllers
 
                     await _accountService.CreateFromList(accounts);
 
-                    return Ok(accounts);
+                    return Ok();
                 }
             }
             catch (System.Exception ex)

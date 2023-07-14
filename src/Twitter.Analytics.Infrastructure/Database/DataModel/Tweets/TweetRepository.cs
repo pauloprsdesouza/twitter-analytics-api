@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Amazon.DynamoDBv2.DataModel;
+using Amazon.DynamoDBv2.DocumentModel;
 using AutoMapper;
 using Twitter.Analytics.Domain.Tweets;
 using Twitter.Analytics.Domain.Tweets.Entities;
@@ -19,6 +20,17 @@ namespace Twitter.Analytics.Infrastructure.Database.DataModel.Tweets
             _dbContext = dbContext;
             _mapper = mapper;
         }
+
+
+        public async Task<List<Tweet>> FindAll()
+        {
+            var condition = new ScanCondition("PK", ScanOperator.BeginsWith, "Tweet");
+            var tweets = await _dbContext.ScanAsync<TweetModel>(new List<ScanCondition>() { condition }).GetRemainingAsync();
+
+            return _mapper.Map<List<Tweet>>(tweets.ToList());
+        }
+
+
 
         public async Task<Tweet> Create(Tweet tweet)
         {
@@ -145,6 +157,18 @@ namespace Twitter.Analytics.Infrastructure.Database.DataModel.Tweets
             await batch.ExecuteAsync();
 
             return tweets;
+        }
+
+        public async Task<Tweet> Update(Tweet tweet)
+        {
+            var tweetModel = _mapper.Map<TweetModel>(tweet);
+
+            var primaryKey = new TweetKey(tweet.Id, tweet.AuthorId);
+            primaryKey.AssignTo(tweetModel);
+
+            await _dbContext.SaveAsync(tweetModel);
+
+            return tweet;
         }
     }
 }

@@ -6,6 +6,7 @@ namespace Twitter.Analytics.Domain.Accounts
 {
     public interface IAccountRepository
     {
+        Task<List<Account>> FindAll();
         Task<Account> Create(Account account);
         Task<Account> Update(Account account);
         Task<List<Account>> FindAllUnprocessed();

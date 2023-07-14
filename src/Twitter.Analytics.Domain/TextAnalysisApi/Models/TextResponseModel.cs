@@ -7,9 +7,9 @@ namespace Twitter.Analytics.Domain.TextAnalysisApi.Models
 {
     public class TextResponseModel
     {
-        public decimal ContextScore { get; set; }
-        public decimal DiversityScore { get; set; }
-        public decimal SentimentSecore { get; set; }
+        public double ContextScore { get; set; }
+        public double DiversityScore { get; set; }
+        public double SentimentScore { get; set; }
         public List<string> Tokens { get; set; }
     }
 }

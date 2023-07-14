@@ -6,6 +6,8 @@ namespace Twitter.Analytics.Domain.Tweets
 {
     public interface ITweetRepository
     {
+        Task<Tweet> Update(Tweet tweet);
+        Task<List<Tweet>> FindAll();
         Task<List<Tweet>> FindAllTweets(List<string> usersId);
         Task<List<Tweet>> GetByAuthorId(string authorId);
         Task<List<Tweet>> GetRepliesByUser(string userId);

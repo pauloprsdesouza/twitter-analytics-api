@@ -37,6 +37,12 @@ namespace Twitter.Analytics.Infrastructure.Database.DataModel.Users
         [DynamoDBProperty]
         public double InfluenceScore { get; set; }
 
+        [DynamoDBProperty]
+        public double ReputationScore { get; set; }
+
+        [DynamoDBProperty]
+        public double EngagementStrengthScore { get; set; }
+
         [DynamoDBProperty(typeof(BoolConverter))]
         public bool IsProcessed { get; set; }
     }

@@ -1,3 +1,4 @@
+using System.Linq;
 using CsvHelper.Configuration;
 using Twitter.Analytics.Domain.Tweets.Entities;
 
@@ -16,6 +17,8 @@ namespace Twitter.Analytics.Domain.Tweets.Models
             Map(x => x.RetweetCount).Name("retweet_count");
             Map(x => x.LikeCount).Name("like_count");
             Map(x => x.CreatedAt).Name("created_at");
+            Map(x => x.Mentions).Convert(x => x.Row.GetField(15).Split("|").Distinct().ToList()).Name("mentions");
+            Map(x => x.Hashtags).Convert(x => x.Row.GetField(16).Split("|").Distinct().ToList()).Name("hashtags");
         }
     }
 }

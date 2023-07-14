@@ -69,6 +69,17 @@ namespace Twitter.Analytics.Infrastructure.Database.DataModel.Users
             return accounts;
         }
 
+        public async Task<List<Account>> FindAll()
+        {
+            var primaryKey = new AccountKey();
+            var accountsModel = await new DynamoDbQueryBuilder<AccountModel>(primaryKey, _dbContext)
+                                        .Build();
+
+            var accounts = _mapper.Map<List<Account>>(accountsModel);
+
+            return accounts;
+        }
+
         public async Task<List<Account>> FindAllUnprocessed()
         {
             var primaryKey = new AccountKey();

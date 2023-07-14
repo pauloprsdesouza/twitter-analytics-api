@@ -10,6 +10,8 @@ namespace Twitter.Analytics.Domain.Accounts.Entities
         public Account()
         {
             Published = new();
+            Mentions = new();
+            Replies = new();
         }
 
         public string Id { get; set; }
@@ -30,8 +32,8 @@ namespace Twitter.Analytics.Domain.Accounts.Entities
         public List<Tweet> Replies { get; set; }
 
         public double RecencyScore => CalculateRecencyScore();
-        public double InfluenceScore => CalculateInfluenceScore();
-        public double ReputationScore => CalculateReputation();
+        public double InfluenceScore { get; set; }
+        public double ReputationScore { get; set; }
         public double EngagementStrengthScore => InfluenceScore * ReputationScore;
 
         private double CalculateRecencyScore()
@@ -43,19 +45,17 @@ namespace Twitter.Analytics.Domain.Accounts.Entities
             return 1 / (1 + decayFactor * Math.Log10(1 + ageInSeconds));
         }
 
-        private double CalculateInfluenceScore()
+        public void CalculateInfluenceScore()
         {
             if (Published.Any())
             {
                 var engagementScore = Published.Sum(x => x.EngagementScore);
                 if (engagementScore > 0 && FollowersCount > 0)
-                    return engagementScore / (Published.Count * FollowersCount);
+                    InfluenceScore = engagementScore / (Published.Count * FollowersCount);
             }
-
-            return 0;
         }
 
-        private double CalculateReputation()
+        public void CalculateReputation()
         {
             var positiveSentiment = 0.0;
             var negativeSentiment = 0.0;
@@ -66,7 +66,7 @@ namespace Twitter.Analytics.Domain.Accounts.Entities
                 var result = CalculateSentimentScore(mention);
 
                 positiveSentiment += result.Item1;
-                negativeSentiment += result.Item1;
+                negativeSentiment += result.Item2;
             }
 
             foreach (var reply in Replies)
@@ -74,8 +74,9 @@ namespace Twitter.Analytics.Domain.Accounts.Entities
                 var result = CalculateSentimentScore(reply);
 
                 positiveSentiment += result.Item1;
-                negativeSentiment += result.Item1;
+                negativeSentiment += result.Item2;
             }
+
 
             if ((positiveSentiment + negativeSentiment) > 0.0)
                 reputationScore = positiveSentiment / (positiveSentiment + negativeSentiment);
@@ -85,7 +86,7 @@ namespace Twitter.Analytics.Domain.Accounts.Entities
             var fineAdjustment = 0.01;
             var normalizedReputationScore = (reputationScore + ListedCount * fineAdjustment) / (1.0 + (ListedCount * fineAdjustment));
 
-            return normalizedReputationScore;
+            ReputationScore = normalizedReputationScore;
         }
 
         private (double, double) CalculateSentimentScore(Tweet tweet)
